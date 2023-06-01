@@ -120,7 +120,7 @@ class WebGPUChild final : public PWebGPUChild, public SupportsWeakPtr {
   static void JsWarning(nsIGlobalObject* aGlobal, const nsACString& aMessage);
 
  private:
-  virtual ~WebGPUChild();
+  ~WebGPUChild() override;
 
   RawId DeviceCreateComputePipelineImpl(
       PipelineCreationContext* const aContext,

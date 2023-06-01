@@ -51,7 +51,7 @@ class RenderPassEncoder final : public ObjectBase,
                     const dom::GPURenderPassDescriptor& aDesc);
 
  protected:
-  virtual ~RenderPassEncoder();
+  ~RenderPassEncoder() override;
   void Cleanup() {}
 
   Scoped<ScopedFfiRenderTraits> mPass;

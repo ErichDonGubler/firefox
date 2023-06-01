@@ -124,7 +124,7 @@ class WebGPUParent final : public PWebGPUParent {
  private:
   void DeallocBufferShmem(RawId aBufferId);
 
-  virtual ~WebGPUParent();
+  ~WebGPUParent() override;
   void MaintainDevices();
 
   bool ForwardError(const RawId aDeviceId, ErrorBuffer& aError) {

@@ -43,7 +43,7 @@ class ComputePassEncoder final : public ObjectBase,
                      const dom::GPUComputePassDescriptor& aDesc);
 
  private:
-  virtual ~ComputePassEncoder();
+  virtual ~ComputePassEncoder() override;
   void Cleanup() {}
 
   Scoped<ScopedFfiComputeTraits> mPass;

@@ -105,7 +105,7 @@ class Device final : public DOMEventTargetHelper, public SupportsWeakPtr {
   bool IsLost() const;
 
  private:
-  ~Device();
+  ~Device() override;
   void Cleanup();
 
   RefPtr<WebGPUChild> mBridge;

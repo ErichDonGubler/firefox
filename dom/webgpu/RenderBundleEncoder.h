@@ -33,7 +33,7 @@ class RenderBundleEncoder final : public ObjectBase, public ChildOf<Device> {
                       const dom::GPURenderBundleEncoderDescriptor& aDesc);
 
  private:
-  ~RenderBundleEncoder();
+  ~RenderBundleEncoder() override;
   void Cleanup();
 
   Scoped<ScopedFfiBundleTraits> mEncoder;
