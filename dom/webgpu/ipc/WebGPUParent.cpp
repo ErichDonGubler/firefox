@@ -200,7 +200,7 @@ static void FreeSurface(RawId id, void* param) {
 }
 
 static ffi::WGPUIdentityRecyclerFactory MakeFactory(void* param) {
-  ffi::WGPUIdentityRecyclerFactory factory;
+  ffi::WGPUIdentityRecyclerFactory factory{};
   PodZero(&factory);
   factory.param = param;
   factory.free_adapter = FreeAdapter;
@@ -457,7 +457,7 @@ static void MapCallback(ffi::WGPUBufferMapAsyncStatus status,
     mapData->mMappedSize = size;
   }
 
-  req->mResolver(std::move(result));
+  req->mResolver(result);
   delete req;
 }
 
@@ -1130,7 +1130,7 @@ ipc::IPCResult WebGPUParent::RecvDevicePopErrorScope(
     }
 
     auto& stack = itr->second;
-    if (!stack.size()) {
+    if (stack.empty()) {
       // Content can cause this simply by calling `popErrorScope` when
       // there is no error scope pushed.
       return PopErrorScopeResult{PopErrorScopeResultType::ThrowOperationError,
