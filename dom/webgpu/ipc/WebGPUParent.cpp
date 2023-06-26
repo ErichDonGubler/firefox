@@ -642,13 +642,15 @@ ipc::IPCResult WebGPUParent::RecvQueueWriteAction(
   return IPC_OK();
 }
 
-ipc::IPCResult WebGPUParent::RecvBindGroupLayoutDestroy(RawId aBindGroupId) {
-  ffi::wgpu_server_bind_group_layout_drop(mContext.get(), aBindGroupId);
+ipc::IPCResult WebGPUParent::RecvBindGroupLayoutDestroy(
+    RawId aBindGroupLayoutId) {
+  ffi::wgpu_server_bind_group_layout_drop(mContext.get(), aBindGroupLayoutId);
   return IPC_OK();
 }
 
-ipc::IPCResult WebGPUParent::RecvPipelineLayoutDestroy(RawId aLayoutId) {
-  ffi::wgpu_server_pipeline_layout_drop(mContext.get(), aLayoutId);
+ipc::IPCResult WebGPUParent::RecvPipelineLayoutDestroy(
+    RawId aPipelineLayoutId) {
+  ffi::wgpu_server_pipeline_layout_drop(mContext.get(), aPipelineLayoutId);
   return IPC_OK();
 }
 
