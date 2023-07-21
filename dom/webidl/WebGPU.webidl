@@ -79,7 +79,7 @@ interface GPUAdapterInfo {
 };
 
 interface mixin NavigatorGPU {
-    [SameObject, Exposed=(Window, DedicatedWorker), SecureContext] readonly attribute GPU gpu;
+    [SameObject, SecureContext] readonly attribute GPU gpu;
 };
 // NOTE: see `dom/webidl/Navigator.webidl`
 // Navigator includes NavigatorGPU;
@@ -216,7 +216,7 @@ interface GPUBufferUsage {
 
 typedef [EnforceRange] unsigned long GPUMapModeFlags;
 [Exposed=(Window, DedicatedWorker), SecureContext]
-interface GPUMapMode {
+interface GPUMapMode { // TODO: use `namespace`: see <TODO>
     const GPUFlagsConstant READ  = 0x0001;
     const GPUFlagsConstant WRITE = 0x0002;
 };
@@ -441,7 +441,7 @@ dictionary GPUSamplerDescriptor
     GPUFilterMode minFilter = "nearest";
     GPUMipmapFilterMode mipmapFilter = "nearest";
     float lodMinClamp = 0;
-    float lodMaxClamp = 1000.0; // TODO: What should this be?
+    float lodMaxClamp = 32;
     GPUCompareFunction compare;
     [Clamp] unsigned short maxAnisotropy = 1;
 };
@@ -595,9 +595,15 @@ GPUShaderModule includes GPUObjectBase;
 
 dictionary GPUShaderModuleDescriptor
          : GPUObjectDescriptorBase {
-    // UTF8String is not observably different from USVString
+    // NOTE: UTF8String is not observably different from USVString
+    // TODO: but y tho still
     required UTF8String code;
     object sourceMap;
+    record<USVString, GPUShaderModuleCompilationHint> hints;
+};
+
+dictionary GPUShaderModuleCompilationHint {
+    (GPUPipelineLayout or GPUAutoLayoutMode) layout;
 };
 
 enum GPUCompilationMessageType {
@@ -621,6 +627,21 @@ interface GPUCompilationInfo {
     readonly attribute FrozenArray<GPUCompilationMessage> messages;
 };
 
+[Exposed=(Window, DedicatedWorker), SecureContext, Serializable]
+interface GPUPipelineError : DOMException {
+    constructor((DOMString or undefined) message, GPUPipelineErrorInit options);
+    readonly attribute GPUPipelineErrorReason reason;
+};
+
+dictionary GPUPipelineErrorInit {
+    required GPUPipelineErrorReason reason;
+};
+
+enum GPUPipelineErrorReason {
+    "validation",
+    "internal",
+};
+
 enum GPUAutoLayoutMode {
     "auto",
 };
@@ -631,6 +652,7 @@ dictionary GPUPipelineDescriptorBase
 };
 
 interface mixin GPUPipelineBase {
+    // TODO: [NewObject] GPUBindGroupLayout getBindGroupLayout(unsigned long index);
     GPUBindGroupLayout getBindGroupLayout(unsigned long index);
 };
 
@@ -655,8 +677,6 @@ dictionary GPUComputePipelineDescriptor
     required GPUProgrammableStage compute;
 };
 
-//TODO: Serializable
-// https://bugzilla.mozilla.org/show_bug.cgi?id=1696219
 [Exposed=(Window, DedicatedWorker), SecureContext]
 interface GPURenderPipeline {
 };
@@ -1030,6 +1050,8 @@ dictionary GPURenderPassDescriptor
     GPURenderPassDepthStencilAttachment depthStencilAttachment;
     GPUQuerySet occlusionQuerySet;
     GPURenderPassTimestampWrites timestampWrites;
+    // // TODO
+    // GPUSize64 maxDrawCount = 50000000;
 };
 
 dictionary GPURenderPassColorAttachment {
@@ -1156,6 +1178,10 @@ GPUQueue includes GPUObjectBase;
 [Exposed=(Window, DedicatedWorker), SecureContext]
 interface GPUQuerySet {
     undefined destroy();
+
+    // // TODO
+    // readonly attribute GPUQueryType type;
+    // readonly attribute GPUSize32Out count;
 };
 GPUQuerySet includes GPUObjectBase;
 
