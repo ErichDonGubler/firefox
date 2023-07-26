@@ -8,11 +8,11 @@
  */
 
 interface mixin GPUObjectBase {
-    attribute USVString? label;
+    attribute USVString label;
 };
 
 dictionary GPUObjectDescriptorBase {
-    USVString label = "";
+    USVString label;
 };
 
 [Func="mozilla::webgpu::Instance::PrefEnabled",
@@ -120,7 +120,7 @@ interface GPUAdapter {
 dictionary GPUDeviceDescriptor
          : GPUObjectDescriptorBase {
     sequence<GPUFeatureName> requiredFeatures = [];
-    record<DOMString, GPUSize64> requiredLimits;
+    record<DOMString, GPUSize64> requiredLimits = {};
     GPUQueueDescriptor defaultQueue = {};
 };
 
@@ -674,7 +674,7 @@ dictionary GPUMultisampleState {
 
 dictionary GPUFragmentState
          : GPUProgrammableStage {
-    required sequence<GPUColorTargetState> targets;
+    required sequence<GPUColorTargetState?> targets;
 };
 
 dictionary GPUColorTargetState {
@@ -733,8 +733,8 @@ enum GPUBlendOperation {
 dictionary GPUDepthStencilState {
     required GPUTextureFormat format;
 
-    boolean depthWriteEnabled = false;
-    GPUCompareFunction depthCompare = "always";
+    required boolean depthWriteEnabled;
+    required GPUCompareFunction depthCompare;
 
     GPUStencilFaceState stencilFront = {};
     GPUStencilFaceState stencilBack = {};
@@ -840,7 +840,7 @@ dictionary GPUImageCopyBuffer
 dictionary GPUImageCopyTexture {
     required GPUTexture texture;
     GPUIntegerCoordinate mipLevel = 0;
-    GPUOrigin3D origin;
+    GPUOrigin3D origin = {};
     GPUTextureAspect aspect = "all";
 };
 
@@ -913,8 +913,13 @@ dictionary GPUCommandEncoderDescriptor
 };
 
 interface mixin GPUBindingCommandsMixin {
-    undefined setBindGroup(GPUIndex32 index, GPUBindGroup bindGroup,
+    undefined setBindGroup(GPUIndex32 index, GPUBindGroup? bindGroup,
         optional sequence<GPUBufferDynamicOffset> dynamicOffsets = []);
+
+    undefined setBindGroup(GPUIndex32 index, GPUBindGroup? bindGroup,
+        Uint32Array dynamicOffsetsData,
+        GPUSize64 dynamicOffsetsDataStart,
+        GPUSize32 dynamicOffsetsDataLength);
 };
 
 interface mixin GPUDebugCommandsMixin {
@@ -969,7 +974,7 @@ GPURenderPassEncoder includes GPURenderCommandsMixin;
 
 dictionary GPURenderPassDescriptor
          : GPUObjectDescriptorBase {
-    required sequence<GPURenderPassColorAttachment> colorAttachments;
+    required sequence<GPURenderPassColorAttachment?> colorAttachments;
     GPURenderPassDepthStencilAttachment depthStencilAttachment;
     GPUQuerySet occlusionQuerySet;
 };
@@ -1009,7 +1014,7 @@ enum GPUStoreOp {
 
 dictionary GPURenderPassLayout
          : GPUObjectDescriptorBase {
-    required sequence<GPUTextureFormat> colorFormats;
+    required sequence<GPUTextureFormat?> colorFormats;
     GPUTextureFormat depthStencilFormat;
     GPUSize32 sampleCount = 1;
 };
@@ -1017,8 +1022,8 @@ dictionary GPURenderPassLayout
 interface mixin GPURenderCommandsMixin {
     undefined setPipeline(GPURenderPipeline pipeline);
 
-    undefined setIndexBuffer(GPUBuffer buffer, GPUIndexFormat indexFormat, optional GPUSize64 offset = 0, optional GPUSize64 size = 0);
-    undefined setVertexBuffer(GPUIndex32 slot, GPUBuffer buffer, optional GPUSize64 offset = 0, optional GPUSize64 size = 0);
+    undefined setIndexBuffer(GPUBuffer buffer, GPUIndexFormat indexFormat, optional GPUSize64 offset = 0, optional GPUSize64 size);
+    undefined setVertexBuffer(GPUIndex32 slot, GPUBuffer? buffer, optional GPUSize64 offset = 0, optional GPUSize64 size);
 
     undefined draw(GPUSize32 vertexCount, optional GPUSize32 instanceCount = 1,
         optional GPUSize32 firstVertex = 0, optional GPUSize32 firstInstance = 0);
