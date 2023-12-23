@@ -329,8 +329,20 @@ webgpu:
     selector: fuzzy
     description: >-
         Runs the tests relevant to WebGPU.
+    full: true
     query:
-        - "'webgpu"
+        # Mochitests
+        # * Avoid variants (i.e., `-swr`, `-nofis`).
+        - "'test-linux2204-64-wayland/opt mochitest-webgpu$"
+        - "'test-macosx1015-64-qr/ mochitest-webgpu$"
+        - "'test-windows11-64-2009-qr/ mochitest-webgpu$"
+
+        # WPT tests
+        - "'test-linux2204-64-wayland/opt 'web-platform-tests-webgpu"
+        - "'test-macosx1015-64-qr/ 'web-platform-tests-webgpu"
+        - "'test-windows11-64-2009-qr/ 'web-platform-tests-webgpu"
+
+        # Other lints
         - "source-test-mozlint-updatebot"
         - "source-test-vendor-rust"
 
