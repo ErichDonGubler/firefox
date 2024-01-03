@@ -109,7 +109,7 @@ class Adapter final : public ObjectBase, public ChildOf<Instance> {
       const dom::GPUDeviceDescriptor& aDesc, ErrorResult& aRv);
 
   already_AddRefed<dom::Promise> RequestAdapterInfo(
-      const dom::Sequence<nsString>& aUnmaskHints, ErrorResult& aRv) const;
+      const dom::Sequence<nsString>& aUnmaskHints) const;
 };
 
 }  // namespace webgpu
