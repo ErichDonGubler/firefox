@@ -61,6 +61,7 @@ already_AddRefed<dom::Promise> Instance::RequestAdapter(
   if (NS_WARN_IF(!promise)) {
     return nullptr;
   }
+  // TODO: use `NS_WARN_IF` everywhere!
 
   // -
   // Check if we should allow the request.
