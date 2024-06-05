@@ -169,7 +169,7 @@ interface GPUDevice : EventTarget {
     GPUCommandEncoder createCommandEncoder(optional GPUCommandEncoderDescriptor descriptor = {});
     GPURenderBundleEncoder createRenderBundleEncoder(GPURenderBundleEncoderDescriptor descriptor);
 
-    //GPUQuerySet createQuerySet(GPUQuerySetDescriptor descriptor);
+    GPUQuerySet createQuerySet(GPUQuerySetDescriptor descriptor);
 };
 GPUDevice includes GPUObjectBase;
 
@@ -902,6 +902,15 @@ interface GPUCommandEncoder {
         optional GPUSize64 offset = 0,
         optional GPUSize64 size);
 
+    undefined writeTimestamp(GPUQuerySet querySet, GPUSize32 queryIndex);
+
+    undefined resolveQuerySet(
+        GPUQuerySet querySet,
+        GPUSize32 firstQuery,
+        GPUSize32 queryCount,
+        GPUBuffer destination,
+        GPUSize64 destinationOffset);
+
     GPUCommandBuffer finish(optional GPUCommandBufferDescriptor descriptor = {});
 };
 GPUCommandEncoder includes GPUObjectBase;
@@ -943,8 +952,15 @@ GPUComputePassEncoder includes GPUCommandsMixin;
 GPUComputePassEncoder includes GPUDebugCommandsMixin;
 GPUComputePassEncoder includes GPUBindingCommandsMixin;
 
+dictionary GPUComputePassTimestampWrites {
+    required GPUQuerySet querySet;
+    GPUSize32 beginningOfPassWriteIndex;
+    GPUSize32 endOfPassWriteIndex;
+};
+
 dictionary GPUComputePassDescriptor
          : GPUObjectDescriptorBase {
+    GPUComputePassTimestampWrites timestampWrites;
 };
 
 [Func="mozilla::webgpu::Instance::PrefEnabled",
@@ -960,8 +976,8 @@ interface GPURenderPassEncoder {
     undefined setBlendConstant(GPUColor color);
     undefined setStencilReference(GPUStencilValue reference);
 
-    //undefined beginOcclusionQuery(GPUSize32 queryIndex);
-    //undefined endOcclusionQuery();
+    undefined beginOcclusionQuery(GPUSize32 queryIndex);
+    undefined endOcclusionQuery();
 
     undefined executeBundles(sequence<GPURenderBundle> bundles);
     undefined end();
@@ -972,11 +988,18 @@ GPURenderPassEncoder includes GPUDebugCommandsMixin;
 GPURenderPassEncoder includes GPUBindingCommandsMixin;
 GPURenderPassEncoder includes GPURenderCommandsMixin;
 
+dictionary GPURenderPassTimestampWrites {
+    required GPUQuerySet querySet;
+    GPUSize32 beginningOfPassWriteIndex;
+    GPUSize32 endOfPassWriteIndex;
+};
+
 dictionary GPURenderPassDescriptor
          : GPUObjectDescriptorBase {
     required sequence<GPURenderPassColorAttachment?> colorAttachments;
     GPURenderPassDepthStencilAttachment depthStencilAttachment;
     GPUQuerySet occlusionQuerySet;
+    GPURenderPassTimestampWrites timestampWrites;
 };
 
 dictionary GPURenderPassColorAttachment {
@@ -1115,20 +1138,10 @@ dictionary GPUQuerySetDescriptor
          : GPUObjectDescriptorBase {
     required GPUQueryType type;
     required GPUSize32 count;
-    sequence<GPUPipelineStatisticName> pipelineStatistics = [];
-};
-
-enum GPUPipelineStatisticName {
-    "vertex-shader-invocations",
-    "clipper-invocations",
-    "clipper-primitives-out",
-    "fragment-shader-invocations",
-    "compute-shader-invocations"
 };
 
 enum GPUQueryType {
     "occlusion",
-    "pipeline-statistics",
     "timestamp",
 };
 
