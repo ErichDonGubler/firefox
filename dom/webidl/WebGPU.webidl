@@ -57,6 +57,11 @@ interface GPUSupportedFeatures {
 };
 
 [Exposed=(Window, DedicatedWorker), SecureContext]
+interface WGSLLanguageFeatures {
+    readonly setlike<DOMString>;
+};
+
+[Exposed=(Window, DedicatedWorker), SecureContext]
 interface GPUAdapterInfo {
     readonly attribute DOMString vendor;
     readonly attribute DOMString architecture;
@@ -86,6 +91,7 @@ interface GPU {
     [Throws]
     Promise<GPUAdapter?> requestAdapter(optional GPURequestAdapterOptions options = {});
     GPUTextureFormat getPreferredCanvasFormat();
+    [SameObject] readonly attribute WGSLLanguageFeatures wgslLanguageFeatures;
 };
 
 dictionary GPURequestAdapterOptions {
