@@ -1204,12 +1204,13 @@ dictionary GPUCanvasConfiguration {
 };
 
 enum GPUDeviceLostReason {
+    "unknown",
     "destroyed",
 };
 
 [Exposed=(Window, DedicatedWorker), SecureContext]
 interface GPUDeviceLostInfo {
-    readonly attribute any reason; // GPUDeviceLostReason or undefined
+    readonly attribute GPUDeviceLostReason reason;
     readonly attribute DOMString message;
 };
 
