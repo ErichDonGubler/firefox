@@ -3,6 +3,7 @@ use std::{
     env::{current_dir, set_current_dir},
     path::{Path, PathBuf},
     process::ExitCode,
+    sync::OnceLock,
 };
 
 use clap::Parser;
@@ -545,6 +546,7 @@ fn run(args: CliArgs) -> miette::Result<()> {
         log::info!("  …removing {cts_https_html_path}, now that it's been divided up…");
         remove_file(&cts_https_html_path)?;
 
+        // TODO: "ready-to-go" is no longer accurate 😭
         log::info!("moving ready-to-go WPT test files into `cts`…");
 
         let webgpu_dir = out_wpt_dir.child("webgpu");
@@ -581,6 +583,23 @@ fn run(args: CliArgs) -> miette::Result<()> {
             })?;
             fs::rename(&file, &dst_path)
                 .wrap_err_with(|| format!("failed to move {file} to {dst_path}"))?;
+
+            log::trace!("…fixing up {dst_path}'s test script import");
+            let old_contents = fs::read_to_string(&dst_path).wrap_err_with(|| {
+                format!("failed to read contents of {dst_path} to fix imports")
+            })?;
+            let new_contents = {
+                static WORKER_IMPORT_FIXUP_RE: OnceLock<Regex> = OnceLock::new();
+                WORKER_IMPORT_FIXUP_RE
+                    .get_or_init(|| {
+                        Regex::new(r#"import \{ g \} from '((?:\.\./){4})(.*)';\n"#).unwrap()
+                    })
+                    .replace(&old_contents, "import { g } from '../${1}webgpu/$2';\n")
+            };
+            fs::write(&dst_path, new_contents.as_ref()).wrap_err_with(|| {
+                format!("failed to write back contents of {dst_path} after fixing imports")
+            })?;
+            // TODO: file FF bug for not warning on failed ESM modules?
         }
         log::debug!("  …finished moving ready-to-go WPT test files");
 
